@@ -534,6 +534,27 @@
 
   /* ── VERIFIED / AUTH BADGE ── */
   .verified-badge { display:inline-flex; align-items:center; gap:3px; background:rgba(0,180,120,.12); border:1px solid rgba(0,180,120,.25); border-radius:5px; padding:1px 6px; font-size:9px; color:#4ade80; font-weight:700; letter-spacing:.3px; margin-left:4px; }
+
+  /* ── LANGUAGE SELECTOR ── */
+  .lang-selector {
+    display:inline-flex; align-items:center;
+    background:var(--surface2); border:1px solid var(--border);
+    border-radius:20px; padding:3px; gap:2px;
+  }
+  .lang-opt {
+    padding:5px 11px; border-radius:16px; font-family:'Syne',sans-serif;
+    font-size:11px; font-weight:700; cursor:pointer; transition:all .2s;
+    color:var(--muted); border:none; background:transparent; letter-spacing:.3px;
+    white-space:nowrap;
+  }
+  .lang-opt.active {
+    background:var(--accent); color:#000;
+    box-shadow:0 1px 6px rgba(200,245,66,.35);
+  }
+  .lang-opt:not(.active):hover { color:var(--text); }
+
+  /* Auth screen lang selector — absolute top-right */
+  .auth-lang-wrap { position:absolute; top:20px; right:20px; z-index:10; }
 </style>
 </head>
 <body>
@@ -542,34 +563,40 @@
      AUTH SCREEN
 ════════════════════════════════════════ -->
 <div id="auth-screen">
+  <div class="auth-lang-wrap">
+    <div class="lang-selector" id="auth-lang-selector">
+      <button class="lang-opt active" onclick="setLang('en')">EN</button>
+      <button class="lang-opt" onclick="setLang('zh')">中文</button>
+    </div>
+  </div>
   <div class="auth-logo">Pulse</div>
-  <p class="auth-tagline">Your world. Shared live.</p>
+  <p class="auth-tagline" data-i18n="tagline">Your world. Shared live.</p>
 
   <div class="auth-card">
     <div class="auth-tabs">
-      <div class="auth-tab active" onclick="switchAuthTab('login')">Sign In</div>
-      <div class="auth-tab" onclick="switchAuthTab('register')">Create Account</div>
+      <div class="auth-tab active" onclick="switchAuthTab('login')" data-i18n="signIn">Sign In</div>
+      <div class="auth-tab" onclick="switchAuthTab('register')" data-i18n="createAccount">Create Account</div>
     </div>
 
     <!-- LOGIN FORM -->
     <div id="login-form">
       <div class="auth-field">
-        <label>Username</label>
+        <label data-i18n="username">Username</label>
         <input type="text" id="login-user" placeholder="@yourname" autocomplete="username">
       </div>
       <div class="auth-field">
-        <label>Password</label>
+        <label data-i18n="password">Password</label>
         <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
       </div>
-      <button class="btn-primary" onclick="doLogin()">Sign In →</button>
+      <button class="btn-primary" id="btn-signin-btn" onclick="doLogin()" data-i18n="signInBtn">Sign In →</button>
 
-      <div class="auth-divider"><span>or verify with</span></div>
+      <div class="auth-divider"><span data-i18n="orVerifyWith">or verify with</span></div>
       <div class="channel-btns">
         <div class="channel-btn" onclick="startEmailMagicLink()">
-          <span>📧</span><span>Magic Link</span>
+          <span>📧</span><span data-i18n="magicLink">Magic Link</span>
         </div>
         <div class="channel-btn" onclick="startSmsOtp()">
-          <span>📱</span><span>SMS OTP</span>
+          <span>📱</span><span data-i18n="smsOtp">SMS OTP</span>
         </div>
       </div>
     </div>
@@ -577,31 +604,31 @@
     <!-- REGISTER FORM -->
     <div id="register-form" style="display:none;">
       <div class="auth-field">
-        <label>Display Name</label>
+        <label data-i18n="displayName">Display Name</label>
         <input type="text" id="reg-name" placeholder="Jane Doe" maxlength="32">
       </div>
       <div class="auth-field">
-        <label>Username</label>
+        <label data-i18n="username">Username</label>
         <input type="text" id="reg-user" placeholder="@janedoe" maxlength="20">
       </div>
       <div class="auth-field">
-        <label>Password</label>
+        <label data-i18n="password">Password</label>
         <input type="password" id="reg-pass" placeholder="Min 6 characters" autocomplete="new-password">
       </div>
       <div class="auth-field">
-        <label>Email <span style="color:var(--muted);font-size:10px;font-weight:400;text-transform:none;">(for magic link)</span></label>
+        <label>Email <span style="color:var(--muted);font-size:10px;font-weight:400;text-transform:none;" data-i18n="forMagicLink">(for magic link)</span></label>
         <input type="email" id="reg-email" placeholder="jane@example.com" autocomplete="email">
       </div>
       <div class="auth-field">
-        <label>Phone <span style="color:var(--muted);font-size:10px;font-weight:400;text-transform:none;">(for SMS OTP)</span></label>
+        <label>Phone <span style="color:var(--muted);font-size:10px;font-weight:400;text-transform:none;" data-i18n="forSmsOtp">(for SMS OTP)</span></label>
         <input type="tel" id="reg-phone" placeholder="+1 555 000 0000">
       </div>
       <div class="auth-field">
-        <label>Bio (optional)</label>
+        <label data-i18n="bioOptional">Bio (optional)</label>
         <textarea id="reg-bio" placeholder="Tell the world about yourself..." rows="2" style="resize:none;"></textarea>
       </div>
       <div class="auth-field">
-        <label>Choose Avatar</label>
+        <label data-i18n="chooseAvatar">Choose Avatar</label>
         <div class="auth-avatar-picker" id="avatar-picker">
           <div class="avatar-opt selected" data-emoji="😎" onclick="pickAvatar(this)">😎</div>
           <div class="avatar-opt" data-emoji="🦊" onclick="pickAvatar(this)">🦊</div>
@@ -617,7 +644,7 @@
           <div class="avatar-opt" data-emoji="🔥" onclick="pickAvatar(this)">🔥</div>
         </div>
       </div>
-      <button class="btn-primary" onclick="doRegister()">Join Pulse →</button>
+      <button class="btn-primary" id="btn-join-btn" onclick="doRegister()">Join Pulse →</button>
     </div>
 
     <div class="auth-error" id="auth-error"></div>
@@ -637,7 +664,7 @@
         <label>Email Address</label>
         <input type="email" id="magic-email-input" placeholder="you@example.com">
       </div>
-      <button class="btn-primary" onclick="sendMagicLink()">Send Magic Link →</button>
+      <button class="btn-primary" id="btn-send-magic-btn" onclick="sendMagicLink()">Send Magic Link →</button>
     </div>
     <div id="magic-step-sent" style="display:none;">
       <div class="magic-sent-icon">📬</div>
@@ -646,7 +673,7 @@
       <div class="channel-badge">📧 Email • Magic Link sent</div>
       <div style="background:var(--surface2);border-radius:14px;padding:16px;margin-bottom:16px;">
         <div style="font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;font-weight:600;letter-spacing:.5px;">Demo: Click to verify</div>
-        <button class="btn-primary" style="margin-top:0;" onclick="completeMagicLinkAuth()">✅ Open Magic Link (Demo)</button>
+        <button class="btn-primary" id="btn-open-magic-btn" style="margin-top:0;" onclick="completeMagicLinkAuth()">✅ Open Magic Link (Demo)</button>
       </div>
       <div class="resend-link">Didn't get it? <span onclick="resendMagicLink()">Resend email</span></div>
     </div>
@@ -666,7 +693,7 @@
         <label>Phone Number</label>
         <input type="tel" id="sms-phone-input" placeholder="+1 555 000 0000">
       </div>
-      <button class="btn-primary" onclick="sendSmsOtp()">Send Code →</button>
+      <button class="btn-primary" id="btn-send-code-btn" onclick="sendSmsOtp()">Send Code →</button>
     </div>
     <div id="sms-step-otp" style="display:none;">
       <div class="channel-badge">📱 SMS • Code sent to <span id="sms-phone-display"></span></div>
@@ -699,6 +726,10 @@
   <div class="logo" onclick="showPage('feed')">Pulse</div>
   <div id="topbar-title"></div>
   <div class="topbar-actions">
+    <div class="lang-selector" id="app-lang-selector">
+      <button class="lang-opt active" onclick="setLang('en')">EN</button>
+      <button class="lang-opt" onclick="setLang('zh')">中文</button>
+    </div>
     <div class="icon-btn" id="admin-topbar-btn" onclick="openAdmin()" style="display:none;" title="Admin Panel">🛡️</div>
     <div class="icon-btn" onclick="showPage('settings')" title="Settings">⚙️</div>
     <div class="icon-btn" id="user-avatar-btn" style="font-size:20px;">😎</div>
@@ -797,7 +828,7 @@
     </div>
   </div>
   <div class="profile-actions-row">
-    <button class="btn-edit" onclick="openEditProfile()">✏️ Edit Profile</button>
+    <button class="btn-edit" id="btn-edit-profile-btn" onclick="openEditProfile()">✏️ Edit Profile</button>
   </div>
   <div class="profile-info">
     <div class="profile-name" id="profile-name-display">Loading...</div>
@@ -816,39 +847,39 @@
 <div class="page" id="page-settings">
   <div class="settings-section">
     <div class="settings-card">
-      <div class="settings-card-title">🌐 Custom Domain</div>
-      <div class="settings-card-desc">Link your own domain to your Pulse profile.</div>
+      <div class="settings-card-title" id="settings-domain-title-el">🌐 Custom Domain</div>
+      <div class="settings-card-desc" id="settings-domain-desc-el">Link your own domain to your Pulse profile.</div>
       <div class="current-domain" id="current-domain-display" style="display:none;"><div class="dot"></div><span id="domain-display-text">Connected</span></div>
       <div class="domain-input-row">
         <input class="domain-input" type="text" id="custom-domain-input" placeholder="yoursite.com">
-        <button class="btn-accent-sm" onclick="saveDomain()">Connect</button>
+        <button class="btn-accent-sm" id="btn-connect-domain-btn" onclick="saveDomain()">Connect</button>
       </div>
       <div class="domain-status" id="domain-status"></div>
     </div>
 
     <div class="settings-card">
-      <div class="settings-card-title">🔐 Security & Auth</div>
-      <div class="settings-card-desc">Verified sign-in methods linked to your account.</div>
+      <div class="settings-card-title" id="settings-security-title-el">🔐 Security & Auth</div>
+      <div class="settings-card-desc" id="settings-security-desc-el">Verified sign-in methods linked to your account.</div>
       <div class="settings-row">
-        <div><div class="settings-row-label">📧 Email (Magic Link)</div><div class="settings-row-desc" id="settings-email-display">Not linked</div></div>
+        <div><div class="settings-row-label" id="settings-email-label-el">📧 Email (Magic Link)</div><div class="settings-row-desc" id="settings-email-display">Not linked</div></div>
         <div class="verified-badge" id="email-verified-badge" style="display:none;">✓ Verified</div>
       </div>
       <div class="settings-row">
-        <div><div class="settings-row-label">📱 Phone (SMS OTP)</div><div class="settings-row-desc" id="settings-phone-display">Not linked</div></div>
+        <div><div class="settings-row-label" id="settings-phone-label-el">📱 Phone (SMS OTP)</div><div class="settings-row-desc" id="settings-phone-display">Not linked</div></div>
         <div class="verified-badge" id="phone-verified-badge" style="display:none;">✓ Verified</div>
       </div>
     </div>
 
     <div class="settings-card">
-      <div class="settings-card-title">👤 Account</div>
+      <div class="settings-card-title" id="settings-account-title-el">👤 Account</div>
       <div style="margin-bottom:12px;">
-        <div class="settings-row"><div><div class="settings-row-label">Push Notifications</div><div class="settings-row-desc">Get notified about likes and follows</div></div><div class="toggle-switch on" onclick="this.classList.toggle('on')"></div></div>
-        <div class="settings-row"><div><div class="settings-row-label">Private Account</div><div class="settings-row-desc">Only approved followers see your posts</div></div><div class="toggle-switch" onclick="this.classList.toggle('on')"></div></div>
+        <div class="settings-row"><div><div class="settings-row-label" id="settings-notif-label-el">Push Notifications</div><div class="settings-row-desc" id="settings-notif-desc-el">Get notified about likes and follows</div></div><div class="toggle-switch on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="settings-row"><div><div class="settings-row-label" id="settings-private-label-el">Private Account</div><div class="settings-row-desc" id="settings-private-desc-el">Only approved followers see your posts</div></div><div class="toggle-switch" onclick="this.classList.toggle('on')"></div></div>
       </div>
     </div>
 
     <div class="settings-card" id="edit-profile-card">
-      <div class="settings-card-title">✏️ Edit Profile</div>
+      <div class="settings-card-title" id="settings-edit-title-el">✏️ Edit Profile</div>
       <div class="auth-field" style="margin-top:12px;">
         <label>Display Name</label>
         <input type="text" id="edit-name" placeholder="Your name">
@@ -874,10 +905,10 @@
           <div class="avatar-opt" data-emoji="🔥" onclick="pickEditAvatar(this)">🔥</div>
         </div>
       </div>
-      <button class="btn-primary" onclick="saveProfile()">Save Changes</button>
+      <button class="btn-primary" id="btn-save-profile-btn" onclick="saveProfile()">Save Changes</button>
     </div>
 
-    <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+    <button class="logout-btn" id="logout-btn-el" onclick="doLogout()">Sign Out</button>
     <div style="margin-top:12px;">
       <button id="claim-owner-btn" onclick="claimOwner()" style="width:100%;padding:12px;background:linear-gradient(135deg,rgba(200,245,66,.15),rgba(124,77,255,.15));border:1px solid rgba(200,245,66,.3);border-radius:14px;color:var(--accent);font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;">👑 Claim Owner Access</button>
     </div>
@@ -2066,6 +2097,486 @@ async function adminPinPost(postId){
   renderAdminPosts();
   loadFeed();
   showToast(post.adminPinned?'Post pinned 📌':'Post unpinned','');
+}
+
+// ════════════════════════════════════════
+// LANGUAGE / TRANSLATION SYSTEM
+// ════════════════════════════════════════
+let currentLang = 'en';
+
+const translations = {
+  en: {
+    // Auth screen
+    'auth-tagline':        'Your world. Shared live.',
+    'tab-signin':          'Sign In',
+    'tab-register':        'Create Account',
+    'label-username':      'Username',
+    'label-password':      'Password',
+    'btn-signin':          'Sign In →',
+    'or-verify-with':      'or verify with',
+    'btn-magic-link':      'Magic Link',
+    'btn-sms-otp':         'SMS OTP',
+    'label-display-name':  'Display Name',
+    'label-email':         'Email',
+    'label-email-sub':     '(for magic link)',
+    'label-phone':         'Phone',
+    'label-phone-sub':     '(for SMS OTP)',
+    'label-bio-optional':  'Bio (optional)',
+    'label-choose-avatar': 'Choose Avatar',
+    'btn-join':            'Join Pulse →',
+    'ph-username':         '@yourname',
+    'ph-password':         '••••••••',
+    'ph-displayname':      'Jane Doe',
+    'ph-reg-user':         '@janedoe',
+    'ph-reg-pass':         'Min 6 characters',
+    'ph-email':            'jane@example.com',
+    'ph-phone':            '+1 555 000 0000',
+    'ph-bio':              'Tell the world about yourself...',
+    // Magic link modal
+    'magic-title':         '✨ Magic Link',
+    'magic-sub':           "Enter your email and we'll send a one-click sign-in link instantly.",
+    'label-email-addr':    'Email Address',
+    'ph-magic-email':      'you@example.com',
+    'btn-send-magic':      'Send Magic Link →',
+    'magic-sent-title':    'Check your inbox!',
+    'magic-sent-sub-pre':  "We've sent a magic sign-in link to",
+    'magic-sent-sub-post': '. It expires in 10 minutes.',
+    'magic-demo-label':    'Demo: Click to verify',
+    'btn-open-magic':      '✅ Open Magic Link (Demo)',
+    'magic-resend-pre':    "Didn't get it?",
+    'magic-resend-link':   'Resend email',
+    // SMS OTP modal
+    'sms-title':           '📱 SMS Verification',
+    'sms-sub':             'Enter your phone number to receive a 6-digit code via SMS.',
+    'label-phone-num':     'Phone Number',
+    'ph-sms-phone':        '+1 555 000 0000',
+    'btn-send-code':       'Send Code →',
+    'sms-otp-title':       'Enter your code',
+    'sms-otp-sub':         'A 6-digit verification code was sent to your phone. It expires in 5 minutes.',
+    'btn-verify-code':     'Verify Code →',
+    'sms-resend-pre':      "Didn't get it?",
+    'sms-resend-link':     'Resend SMS',
+    // Top bar / nav
+    'nav-home':            'Home',
+    'nav-explore':         'Explore',
+    'nav-activity':        'Activity',
+    'nav-profile':         'Profile',
+    // Feed
+    'story-yours':         'Your Story',
+    'feed-loading':        'Loading posts…',
+    // Profile
+    'btn-edit-profile':    '✏️ Edit Profile',
+    'stat-posts':          'Posts',
+    'stat-followers':      'Followers',
+    'stat-following':      'Following',
+    // Settings
+    'settings-domain-title':  '🌐 Custom Domain',
+    'settings-domain-desc':   'Link your own domain to your Pulse profile.',
+    'btn-connect-domain':     'Connect',
+    'ph-domain':              'yoursite.com',
+    'settings-security-title':'🔐 Security & Auth',
+    'settings-security-desc': 'Verified sign-in methods linked to your account.',
+    'settings-email-label':   '📧 Email (Magic Link)',
+    'settings-phone-label':   '📱 Phone (SMS OTP)',
+    'settings-account-title': '👤 Account',
+    'settings-notif-label':   'Push Notifications',
+    'settings-notif-desc':    'Get notified about likes and follows',
+    'settings-private-label': 'Private Account',
+    'settings-private-desc':  'Only approved followers see your posts',
+    'settings-edit-title':    '✏️ Edit Profile',
+    'label-edit-name':        'Display Name',
+    'label-edit-bio':         'Bio',
+    'ph-edit-name':           'Your name',
+    'ph-edit-bio':            "What's your vibe?",
+    'btn-save-changes':       'Save Changes',
+    'btn-signout':            'Sign Out',
+    'btn-claim-owner':        '👑 Claim Owner Access',
+    'app-footer':             'Pulse v3.0 — Your world, shared live 🌍',
+    // Create post
+    'create-title':           'New Post',
+    'ph-create':              "What's happening in your world?",
+    'btn-photo':              '📷 Photo',
+    'btn-video':              '🎬 Video',
+    'btn-post':               'Post',
+    // DMs
+    'ph-search-messages':     'Search messages...',
+    'messages-label':         'Messages',
+    'chat-active':            '● Active now',
+    'ph-message':             'Message...',
+    // Notifications
+    'notif-all':              'All',
+    'notif-likes':            'Likes',
+    'notif-comments':         'Comments',
+    'notif-follows':          'Follows',
+    // Admin
+    'admin-title':            'Admin Panel',
+    'admin-tab-users':        '👥 Users',
+    'admin-tab-posts':        '📝 Posts',
+    'ph-search-users':        'Search users…',
+    'ph-search-posts':        'Search posts…',
+    // Edit user modal
+    'edit-user-title':        '✏️ Edit User',
+    'label-reset-pass':       'Reset Password',
+    'ph-edit-modal-name':     'Display name',
+    'ph-edit-modal-bio':      'User bio',
+    'ph-edit-modal-pass':     'Leave blank to keep current',
+    'btn-cancel':             'Cancel',
+    'btn-save-user':          'Save Changes',
+    // Lang button
+    'lang-btn-label':         '🌐 中文',
+  },
+  zh: {
+    // Auth screen
+    'auth-tagline':        '你的世界，实时分享。',
+    'tab-signin':          '登录',
+    'tab-register':        '注册账号',
+    'label-username':      '用户名',
+    'label-password':      '密码',
+    'btn-signin':          '登录 →',
+    'or-verify-with':      '或通过以下方式验证',
+    'btn-magic-link':      '魔法链接',
+    'btn-sms-otp':         '短信验证码',
+    'label-display-name':  '显示名称',
+    'label-email':         '邮箱',
+    'label-email-sub':     '（用于魔法链接）',
+    'label-phone':         '手机号',
+    'label-phone-sub':     '（用于短信验证）',
+    'label-bio-optional':  '个人简介（可选）',
+    'label-choose-avatar': '选择头像',
+    'btn-join':            '加入 Pulse →',
+    'ph-username':         '@你的名字',
+    'ph-password':         '••••••••',
+    'ph-displayname':      '张三',
+    'ph-reg-user':         '@zhangsan',
+    'ph-reg-pass':         '至少6个字符',
+    'ph-email':            'example@email.com',
+    'ph-phone':            '+86 138 0000 0000',
+    'ph-bio':              '向世界介绍一下自己吧...',
+    // Magic link modal
+    'magic-title':         '✨ 魔法链接',
+    'magic-sub':           '输入您的邮箱，我们将立即发送一键登录链接。',
+    'label-email-addr':    '邮箱地址',
+    'ph-magic-email':      'you@example.com',
+    'btn-send-magic':      '发送魔法链接 →',
+    'magic-sent-title':    '请查收邮件！',
+    'magic-sent-sub-pre':  '我们已向',
+    'magic-sent-sub-post': ' 发送了魔法登录链接，有效期10分钟。',
+    'magic-demo-label':    '演示：点击验证',
+    'btn-open-magic':      '✅ 打开魔法链接（演示）',
+    'magic-resend-pre':    '没收到？',
+    'magic-resend-link':   '重新发送邮件',
+    // SMS OTP modal
+    'sms-title':           '📱 短信验证',
+    'sms-sub':             '输入手机号，我们将发送6位验证码。',
+    'label-phone-num':     '手机号码',
+    'ph-sms-phone':        '+86 138 0000 0000',
+    'btn-send-code':       '发送验证码 →',
+    'sms-otp-title':       '输入验证码',
+    'sms-otp-sub':         '已向您的手机发送6位验证码，有效期5分钟。',
+    'btn-verify-code':     '验证 →',
+    'sms-resend-pre':      '没收到？',
+    'sms-resend-link':     '重新发送短信',
+    // Top bar / nav
+    'nav-home':            '首页',
+    'nav-explore':         '发现',
+    'nav-activity':        '动态',
+    'nav-profile':         '我的',
+    // Feed
+    'story-yours':         '我的故事',
+    'feed-loading':        '加载中…',
+    // Profile
+    'btn-edit-profile':    '✏️ 编辑资料',
+    'stat-posts':          '帖子',
+    'stat-followers':      '粉丝',
+    'stat-following':      '关注',
+    // Settings
+    'settings-domain-title':  '🌐 自定义域名',
+    'settings-domain-desc':   '将您的域名绑定到 Pulse 个人主页。',
+    'btn-connect-domain':     '连接',
+    'ph-domain':              'yoursite.com',
+    'settings-security-title':'🔐 安全与认证',
+    'settings-security-desc': '已关联到您账户的验证方式。',
+    'settings-email-label':   '📧 邮箱（魔法链接）',
+    'settings-phone-label':   '📱 手机（短信验证）',
+    'settings-account-title': '👤 账号',
+    'settings-notif-label':   '推送通知',
+    'settings-notif-desc':    '获取点赞和关注的通知',
+    'settings-private-label': '私密账号',
+    'settings-private-desc':  '仅获批准的粉丝可查看您的帖子',
+    'settings-edit-title':    '✏️ 编辑资料',
+    'label-edit-name':        '显示名称',
+    'label-edit-bio':         '个人简介',
+    'ph-edit-name':           '你的名字',
+    'ph-edit-bio':            '你的个性签名？',
+    'btn-save-changes':       '保存更改',
+    'btn-signout':            '退出登录',
+    'btn-claim-owner':        '👑 申请所有者权限',
+    'app-footer':             'Pulse v3.0 — 你的世界，实时分享 🌍',
+    // Create post
+    'create-title':           '新帖子',
+    'ph-create':              '你的世界里正在发生什么？',
+    'btn-photo':              '📷 照片',
+    'btn-video':              '🎬 视频',
+    'btn-post':               '发布',
+    // DMs
+    'ph-search-messages':     '搜索消息...',
+    'messages-label':         '消息',
+    'chat-active':            '● 在线',
+    'ph-message':             '发消息...',
+    // Notifications
+    'notif-all':              '全部',
+    'notif-likes':            '点赞',
+    'notif-comments':         '评论',
+    'notif-follows':          '关注',
+    // Admin
+    'admin-title':            '管理面板',
+    'admin-tab-users':        '👥 用户',
+    'admin-tab-posts':        '📝 帖子',
+    'ph-search-users':        '搜索用户…',
+    'ph-search-posts':        '搜索帖子…',
+    // Edit user modal
+    'edit-user-title':        '✏️ 编辑用户',
+    'label-reset-pass':       '重置密码',
+    'ph-edit-modal-name':     '显示名称',
+    'ph-edit-modal-bio':      '用户简介',
+    'ph-edit-modal-pass':     '留空则保持不变',
+    'btn-cancel':             '取消',
+    'btn-save-user':          '保存更改',
+    // Lang button
+    'lang-btn-label':         '🌐 English',
+  }
+};
+
+function t(key) {
+  return (translations[currentLang] && translations[currentLang][key]) || translations['en'][key] || key;
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  applyTranslations();
+}
+
+function applyTranslations() {
+  const lang = currentLang;
+
+  // Sync all pill selectors — mark active option in each .lang-selector
+  document.querySelectorAll('.lang-selector').forEach(selector => {
+    selector.querySelectorAll('.lang-opt').forEach(opt => {
+      const isEn  = opt.textContent.trim() === 'EN';
+      const isZh  = opt.textContent.trim() === '中文';
+      opt.classList.toggle('active', (isEn && lang === 'en') || (isZh && lang === 'zh'));
+    });
+  });
+
+  // Auth tagline
+  setText('.auth-tagline', t('auth-tagline'));
+
+  // Auth tabs
+  const tabs = document.querySelectorAll('.auth-tab');
+  if (tabs[0]) tabs[0].textContent = t('tab-signin');
+  if (tabs[1]) tabs[1].textContent = t('tab-register');
+
+  // Login form labels
+  setLabelByFor('login-user', t('label-username'));
+  setLabelByFor('login-pass', t('label-password'));
+  setInputPlaceholder('login-user', t('ph-username'));
+  setInputPlaceholder('login-pass', t('ph-password'));
+  setButtonText('btn-signin-btn', t('btn-signin'));
+
+  // Login form: "or verify with" divider
+  const divider = document.querySelector('#login-form .auth-divider span');
+  if (divider) divider.textContent = t('or-verify-with');
+
+  // Channel buttons
+  const chanBtns = document.querySelectorAll('#login-form .channel-btn');
+  if (chanBtns[0]) { const spans = chanBtns[0].querySelectorAll('span'); if(spans[1]) spans[1].textContent = t('btn-magic-link'); }
+  if (chanBtns[1]) { const spans = chanBtns[1].querySelectorAll('span'); if(spans[1]) spans[1].textContent = t('btn-sms-otp'); }
+
+  // Register form labels
+  setLabelByFor('reg-name',  t('label-display-name'));
+  setLabelByFor('reg-user',  t('label-username'));
+  setLabelByFor('reg-pass',  t('label-password'));
+  setInputPlaceholder('reg-name',  t('ph-displayname'));
+  setInputPlaceholder('reg-user',  t('ph-reg-user'));
+  setInputPlaceholder('reg-pass',  t('ph-reg-pass'));
+  setInputPlaceholder('reg-email', t('ph-email'));
+  setInputPlaceholder('reg-phone', t('ph-phone'));
+  setInputPlaceholder('reg-bio',   t('ph-bio'));
+  setButtonText('btn-join-btn', t('btn-join'));
+
+  // Email label with sub-text
+  const emailFieldLabel = document.querySelector('#register-form .auth-field:nth-of-type(4) label');
+  if (emailFieldLabel) {
+    emailFieldLabel.innerHTML = t('label-email') + ' <span style="color:var(--muted);font-size:10px;font-weight:400;text-transform:none;">' + t('label-email-sub') + '</span>';
+  }
+  const phoneFieldLabel = document.querySelector('#register-form .auth-field:nth-of-type(5) label');
+  if (phoneFieldLabel) {
+    phoneFieldLabel.innerHTML = t('label-phone') + ' <span style="color:var(--muted);font-size:10px;font-weight:400;text-transform:none;">' + t('label-phone-sub') + '</span>';
+  }
+  const bioFieldLabel = document.querySelector('#register-form .auth-field:nth-of-type(6) label');
+  if (bioFieldLabel) bioFieldLabel.textContent = t('label-bio-optional');
+  const avatarFieldLabel = document.querySelector('#register-form .auth-field:nth-of-type(7) label');
+  if (avatarFieldLabel) avatarFieldLabel.textContent = t('label-choose-avatar');
+
+  // Magic link modal
+  const magicInputTitle = document.querySelector('#magic-step-input .modal-title');
+  if (magicInputTitle) magicInputTitle.textContent = t('magic-title');
+  const magicInputSub = document.querySelector('#magic-step-input .modal-sub');
+  if (magicInputSub) magicInputSub.textContent = t('magic-sub');
+  const magicEmailLabel = document.querySelector('#magic-step-input label');
+  if (magicEmailLabel) magicEmailLabel.textContent = t('label-email-addr');
+  setInputPlaceholder('magic-email-input', t('ph-magic-email'));
+  setButtonText('btn-send-magic-btn', t('btn-send-magic'));
+
+  const magicSentTitle = document.querySelector('#magic-step-sent .modal-title');
+  if (magicSentTitle) magicSentTitle.textContent = t('magic-sent-title');
+  const magicDemoLabel = document.querySelector('#magic-step-sent [style*="font-size:12px"]');
+  if (magicDemoLabel) magicDemoLabel.textContent = t('magic-demo-label');
+  setButtonText('btn-open-magic-btn', t('btn-open-magic'));
+  const magicResend = document.querySelector('#magic-step-sent .resend-link');
+  if (magicResend) {
+    const emailDisplay = document.getElementById('magic-email-display');
+    const emailVal = emailDisplay ? emailDisplay.outerHTML : '';
+    magicResend.innerHTML = t('magic-resend-pre') + ' <span onclick="resendMagicLink()">' + t('magic-resend-link') + '</span>';
+  }
+
+  // SMS modal
+  const smsInputTitle = document.querySelector('#sms-step-input .modal-title');
+  if (smsInputTitle) smsInputTitle.textContent = t('sms-title');
+  const smsInputSub = document.querySelector('#sms-step-input .modal-sub');
+  if (smsInputSub) smsInputSub.textContent = t('sms-sub');
+  const smsPhoneLabel = document.querySelector('#sms-step-input label');
+  if (smsPhoneLabel) smsPhoneLabel.textContent = t('label-phone-num');
+  setInputPlaceholder('sms-phone-input', t('ph-sms-phone'));
+  setButtonText('btn-send-code-btn', t('btn-send-code'));
+
+  const smsOtpTitle = document.querySelector('#sms-step-otp .modal-title');
+  if (smsOtpTitle) smsOtpTitle.textContent = t('sms-otp-title');
+  const smsOtpSub = document.querySelector('#sms-step-otp .modal-sub');
+  if (smsOtpSub) smsOtpSub.textContent = t('sms-otp-sub');
+  setButtonText('verify-otp-btn', t('btn-verify-code'));
+  const smsResend = document.querySelector('#sms-step-otp .resend-link');
+  if (smsResend) {
+    const phoneDisplay = document.getElementById('sms-phone-display');
+    smsResend.innerHTML = t('sms-resend-pre') + ' <span onclick="resendSmsOtp()">' + t('sms-resend-link') + '</span>';
+  }
+
+  // Bottom nav
+  const navLabels = document.querySelectorAll('.nav-label');
+  const navKeys = ['nav-home','nav-explore','nav-activity','nav-profile'];
+  navLabels.forEach((el,i) => { if(navKeys[i]) el.textContent = t(navKeys[i]); });
+
+  // Story "Your Story"
+  const storyNames = document.querySelectorAll('.story-name');
+  if (storyNames[0]) storyNames[0].textContent = t('story-yours');
+
+  // Profile page
+  setButtonText('btn-edit-profile-btn', t('btn-edit-profile'));
+  const statLabels = document.querySelectorAll('.stat-label');
+  const statKeys = ['stat-posts','stat-followers','stat-following'];
+  statLabels.forEach((el,i) => { if(statKeys[i]) el.textContent = t(statKeys[i]); });
+
+  // Settings
+  setTextById('settings-domain-title-el',  t('settings-domain-title'));
+  setTextById('settings-domain-desc-el',   t('settings-domain-desc'));
+  setButtonText('btn-connect-domain-btn',   t('btn-connect-domain'));
+  setInputPlaceholder('custom-domain-input', t('ph-domain'));
+  setTextById('settings-security-title-el', t('settings-security-title'));
+  setTextById('settings-security-desc-el',  t('settings-security-desc'));
+  setTextById('settings-email-label-el',    t('settings-email-label'));
+  setTextById('settings-phone-label-el',    t('settings-phone-label'));
+  setTextById('settings-account-title-el',  t('settings-account-title'));
+  setTextById('settings-notif-label-el',    t('settings-notif-label'));
+  setTextById('settings-notif-desc-el',     t('settings-notif-desc'));
+  setTextById('settings-private-label-el',  t('settings-private-label'));
+  setTextById('settings-private-desc-el',   t('settings-private-desc'));
+  setTextById('settings-edit-title-el',     t('settings-edit-title'));
+
+  // Edit profile form labels
+  const editNameLabel = document.querySelector('#edit-profile-card .auth-field:nth-of-type(1) label');
+  if (editNameLabel) editNameLabel.textContent = t('label-edit-name');
+  const editBioLabel = document.querySelector('#edit-profile-card .auth-field:nth-of-type(2) label');
+  if (editBioLabel) editBioLabel.textContent = t('label-edit-bio');
+  const editAvatarLabel = document.querySelector('#edit-profile-card .auth-field:nth-of-type(3) label');
+  if (editAvatarLabel) editAvatarLabel.textContent = t('label-choose-avatar');
+  setInputPlaceholder('edit-name', t('ph-edit-name'));
+  setInputPlaceholder('edit-bio',  t('ph-edit-bio'));
+  setButtonText('btn-save-profile-btn', t('btn-save-changes'));
+  setButtonText('logout-btn-el', t('btn-signout'));
+  setButtonText('claim-owner-btn', t('btn-claim-owner'));
+  const footer = document.querySelector('#page-settings [style*="text-align:center"]');
+  if (footer) footer.textContent = t('app-footer');
+
+  // Create post overlay
+  const createTitle = document.querySelector('.create-title');
+  if (createTitle) createTitle.textContent = t('create-title');
+  setInputPlaceholder('create-textarea', t('ph-create'));
+  const createBtns = document.querySelectorAll('.create-opt-btn');
+  if (createBtns[0]) createBtns[0].textContent = t('btn-photo');
+  if (createBtns[1]) createBtns[1].textContent = t('btn-video');
+  setButtonText('post-submit-btn', t('btn-post'));
+
+  // DMs
+  const dmSearchInput = document.querySelector('#page-dms .dm-search input');
+  if (dmSearchInput) dmSearchInput.placeholder = t('ph-search-messages');
+  const msgLabel = document.querySelector('#page-dms .section-label');
+  if (msgLabel) msgLabel.textContent = t('messages-label');
+
+  // Chat
+  const chatStatus = document.querySelector('.chat-status');
+  if (chatStatus) chatStatus.textContent = t('chat-active');
+  setInputPlaceholder('chat-input', t('ph-message'));
+
+  // Notifications filter chips
+  const chips = document.querySelectorAll('.notif-chip');
+  const chipKeys = ['notif-all','notif-likes','notif-comments','notif-follows'];
+  chips.forEach((el,i) => { if(chipKeys[i]) el.textContent = t(chipKeys[i]); });
+
+  // Admin panel
+  const adminTitle = document.querySelector('.admin-title');
+  if (adminTitle) adminTitle.textContent = t('admin-title');
+  const adminTabUsers = document.getElementById('admin-tab-users');
+  if (adminTabUsers) adminTabUsers.textContent = t('admin-tab-users');
+  const adminTabPosts = document.getElementById('admin-tab-posts');
+  if (adminTabPosts) adminTabPosts.textContent = t('admin-tab-posts');
+  setInputPlaceholder('admin-user-search', t('ph-search-users'));
+  setInputPlaceholder('admin-post-search', t('ph-search-posts'));
+
+  // Admin edit user modal
+  const editUserTitle = document.querySelector('.admin-modal-title');
+  if (editUserTitle) editUserTitle.textContent = t('edit-user-title');
+  const editModalLabels = document.querySelectorAll('#admin-edit-modal .auth-field label');
+  if (editModalLabels[0]) editModalLabels[0].textContent = t('label-display-name');
+  if (editModalLabels[1]) editModalLabels[1].textContent = t('label-edit-bio');
+  if (editModalLabels[2]) editModalLabels[2].textContent = t('label-reset-pass');
+  setInputPlaceholder('edit-modal-name', t('ph-edit-modal-name'));
+  setInputPlaceholder('edit-modal-bio',  t('ph-edit-modal-bio'));
+  setInputPlaceholder('edit-modal-password', t('ph-edit-modal-pass'));
+  const editModalBtns = document.querySelectorAll('#admin-edit-modal .admin-act-btn');
+  if (editModalBtns[0]) editModalBtns[0].textContent = t('btn-cancel');
+  if (editModalBtns[1]) editModalBtns[1].textContent = t('btn-save-user');
+}
+
+// Helper utilities
+function setText(selector, text) {
+  const el = document.querySelector(selector);
+  if (el) el.textContent = text;
+}
+function setTextById(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+function setInputPlaceholder(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.placeholder = text;
+}
+function setButtonText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+function setLabelByFor(forAttr, text) {
+  const el = document.querySelector('label[for="' + forAttr + '"]');
+  if (el) el.textContent = text;
 }
 
 window.addEventListener('load',init);
